@@ -40,7 +40,7 @@ struct glowStruct
     float green;//8 to C
     float blue;//C to 10
     float alpha;//10 to 14
-    BYTE buffer[28];//10 + 16 to 14 + x
+    BYTE buffer[16];//10 + 16 to 14 + x
     bool renderWhenOccluded;//24 to 28
     bool renderWhenUnOccluded;//25 to 29
     bool fullBloon;//26 to 30
