@@ -51,7 +51,7 @@ void main()
         val.glowObject = *(DWORD*)(val.gameModule + offsets.glowObjectManager);
         val.myTeam = *(int*)(val.localPlayer + offsets.team);
 
-        for (short int i = 0; i < 64; i++)
+        for (short int i = 0; i <= 64; i++)
         {
 
             //radar
@@ -81,8 +81,8 @@ void main()
                     *(float*)(val.glowObject + (val.glowIndex * 0x38) + 0x14) = 1.7f;
 
                 }
-                *(bool*)(val.glowObject + (val.glowIndex * 0x38) + 0x8) = true;
-                *(bool*)(val.glowObject + (val.glowIndex * 0x38) + 0xC) = true;
+                *(bool*)(val.glowObject + (val.glowIndex * 0x38) + 0x28) = true;
+                *(bool*)(val.glowObject + (val.glowIndex * 0x38) + 0x29) = false;
             }
 
             if ((*(int*)(val.localPlayer + offsets.flashDuration)) != 0)
