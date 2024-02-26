@@ -65,7 +65,6 @@ glowStruct setGlowColor(glowStruct glow, uintptr_t ent)
         glow.red = (*(int*)(val.ent + offsets.health)) * -0.01 + 1;
         glow.green = (*(int*)(val.ent + offsets.health)) * 0.01;
         glow.alpha = 1.0f;
-        
     }
     glow.renderWhenOccluded = true;
     glow.renderWhenUnOccluded = false;
@@ -93,6 +92,7 @@ void setEnemyGlow(uintptr_t ent, int glowIndex)
     
 }
 
+//glowhack
 void handleGlow()
 {
 
@@ -106,7 +106,6 @@ void handleGlow()
         val.ent = *(uintptr_t*)(val.gameModule + offsets.entList + i * 0x10);
         if (val.ent != 0)
         {
-            
 
             val.glowIndex = *(int*)(val.ent + offsets.glowIndex);
             val.entityTeam = *(int*)(val.ent + offsets.team);
@@ -120,15 +119,14 @@ void handleGlow()
             {
                 setEnemyGlow(val.ent, val.glowIndex);
             }
-            
+
         }
 
-       
-
-       
     }
 
 }
+
+
 
 void main()
 {
@@ -163,6 +161,7 @@ void main()
                 handleGlow();
             }
 
+            //anti-flash
             if ((*(int*)(val.localPlayer + offsets.flashDuration)) != 0)
             {
                 *(int*)(val.localPlayer + offsets.flashDuration) = 0;
@@ -175,8 +174,7 @@ void main()
 
             }
         }
-
-        
+ 
     }
 
 }
