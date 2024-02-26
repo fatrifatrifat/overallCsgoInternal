@@ -17,7 +17,7 @@ struct
     uintptr_t team = hazedumper::netvars::m_iTeamNum;
     uintptr_t glowIndex = hazedumper::netvars::m_iGlowIndex;
     uintptr_t health = hazedumper::netvars::m_iHealth;
-    
+    uintptr_t isDefusing = hazedumper::netvars::m_bIsDefusing;
 
 }offsets;
 
@@ -31,6 +31,8 @@ struct
     int myTeam;
     int entityTeam;
     int glowIndex;
+    int health;
+    bool defusing;
 }val;
 
 struct glowStruct
@@ -48,12 +50,26 @@ struct glowStruct
     int glowStyle;
 };
 
-glowStruct setGlowColor(int health)
+glowStruct setGlowColor(glowStruct glow, uintptr_t ent)
 {
-    glowStruct tst;
-    tst.red = 1.0f;
-
-    return tst;
+    val.defusing = *(bool*)(val.ent + offsets.isDefusing);
+    if (val.defusing)
+    {
+        glow.red = 1.0f;
+        glow.green = 1.0f;
+        glow.blue = 1.0f;
+        glow.alpha = 1.0f;
+    }
+    else
+    {
+        glow.red = (*(int*)(val.ent + offsets.health)) * -0.01 + 1;
+        glow.green = (*(int*)(val.ent + offsets.health)) * 0.01;
+        glow.alpha = 1.0f;
+        
+    }
+    glow.renderWhenOccluded = true;
+    glow.renderWhenUnOccluded = false;
+    return glow;
 }
 
 void setTeamGlow(uintptr_t ent, int glowIndex)
@@ -70,7 +86,11 @@ void setTeamGlow(uintptr_t ent, int glowIndex)
 
 void setEnemyGlow(uintptr_t ent, int glowIndex)
 {
-
+    glowStruct eGlow;
+    eGlow = *(glowStruct*)(val.glowObject + (val.glowIndex * 0x38));
+    eGlow = (glowStruct)(setGlowColor(eGlow, val.ent));
+    *(glowStruct*)(val.glowObject + (val.glowIndex * 0x38)) = eGlow;
+    
 }
 
 void handleGlow()
