@@ -53,7 +53,11 @@ struct glowStruct
     int glowStyle;
 };
 
+bool isGlowEnabled = false;  // Added state variable
 
+void toggleGlow() {
+    isGlowEnabled = !isGlowEnabled;
+}
 
 glowStruct setGlowColor(glowStruct glow, uintptr_t ent)
 {
@@ -115,43 +119,19 @@ void handleGlow()
             val.glowIndex = *(int*)(val.ent + offsets.glowIndex);
             val.entityTeam = *(int*)(val.ent + offsets.team);
 
-            //glow
-            if (val.myTeam == val.entityTeam)
-            {
-                setTeamGlow(val.ent, val.glowIndex);
+            if (isGlowEnabled) {
+                if (val.myTeam == val.entityTeam) {
+                    setTeamGlow(val.ent, val.glowIndex);
+                }
+                else {
+                    setEnemyGlow(val.ent, val.glowIndex);
+                }
             }
-            else
-            {
-                setEnemyGlow(val.ent, val.glowIndex);
-            }
-
         }
 
     }
 
 }
-
-//glowhackV2
-
-void handleGlow2(uintptr_t ent)
-{
-    
-    val.glowIndex = *(int*)(ent + offsets.glowIndex);
-    val.entityTeam = *(int*)(ent + offsets.team);
-
-    //glow
-    if (val.myTeam == val.entityTeam)
-    {
-        setTeamGlow(ent, val.glowIndex);
-    }
-    else
-    {
-        setEnemyGlow(ent, val.glowIndex);
-    }
-
-}
-
-
 
 void main()
 {
@@ -183,12 +163,14 @@ void main()
             {
                 *(bool*)(val.ent + offsets.spotted) = true;
 
-                //handleGlow();
+            }
 
-                //glowV2
-                if (GetAsyncKeyState(VK_HOME) & 1)
-                    handleGlow2(val.ent);
+            if (GetAsyncKeyState(VK_HOME) & 1) {
+                toggleGlow();
+            }
 
+            if (isGlowEnabled) {
+                handleGlow();
             }
 
             //anti-flash
