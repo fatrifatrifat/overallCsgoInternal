@@ -5,19 +5,22 @@
 #include <TlHelp32.h>
 #include "csgo.hpp"
 
+using namespace hazedumper::signatures;
+using namespace hazedumper::netvars;
+
 struct
 {
-    uintptr_t lPlayer = hazedumper::signatures::dwLocalPlayer;
-    uintptr_t jump = hazedumper::signatures::dwForceJump;
-    uintptr_t flags = hazedumper::netvars::m_fFlags;
-    uintptr_t entList = hazedumper::signatures::dwEntityList;
-    uintptr_t spotted = hazedumper::netvars::m_bSpotted;
-    uintptr_t flashDuration = hazedumper::netvars::m_flFlashDuration;
-    uintptr_t glowObjectManager = hazedumper::signatures::dwGlowObjectManager;
-    uintptr_t team = hazedumper::netvars::m_iTeamNum;
-    uintptr_t glowIndex = hazedumper::netvars::m_iGlowIndex;
-    uintptr_t health = hazedumper::netvars::m_iHealth;
-    uintptr_t isDefusing = hazedumper::netvars::m_bIsDefusing;
+    uintptr_t lPlayer = dwLocalPlayer;
+    uintptr_t jump = dwForceJump;
+    uintptr_t flags = m_fFlags;
+    uintptr_t entList = dwEntityList;
+    uintptr_t spotted = m_bSpotted;
+    uintptr_t flashDuration = m_flFlashDuration;
+    uintptr_t glowObjectManager = dwGlowObjectManager;
+    uintptr_t team = m_iTeamNum;
+    uintptr_t glowIndex = m_iGlowIndex;
+    uintptr_t health = m_iHealth;
+    uintptr_t isDefusing = m_bIsDefusing;
 
 }offsets;
 
@@ -49,6 +52,8 @@ struct glowStruct
     BYTE buffer1[5];
     int glowStyle;
 };
+
+
 
 glowStruct setGlowColor(glowStruct glow, uintptr_t ent)
 {
