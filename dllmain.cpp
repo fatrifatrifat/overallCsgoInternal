@@ -131,6 +131,26 @@ void handleGlow()
 
 }
 
+//glowhackV2
+
+void handleGlow2(uintptr_t ent)
+{
+    
+    val.glowIndex = *(int*)(ent + offsets.glowIndex);
+    val.entityTeam = *(int*)(ent + offsets.team);
+
+    //glow
+    if (val.myTeam == val.entityTeam)
+    {
+        setTeamGlow(ent, val.glowIndex);
+    }
+    else
+    {
+        setEnemyGlow(ent, val.glowIndex);
+    }
+
+}
+
 
 
 void main()
@@ -163,7 +183,12 @@ void main()
             {
                 *(bool*)(val.ent + offsets.spotted) = true;
 
-                handleGlow();
+                //handleGlow();
+
+                //glowV2
+                if (GetAsyncKeyState(VK_HOME) & 1)
+                    handleGlow2(val.ent);
+
             }
 
             //anti-flash
