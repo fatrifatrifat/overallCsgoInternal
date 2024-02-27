@@ -151,9 +151,6 @@ void main()
     {
         val.flag = *(BYTE*)(val.localPlayer + offsets.flags);
 
-        val.glowObject = *(uintptr_t*)(val.gameModule + offsets.glowObjectManager);
-        val.myTeam = *(int*)(val.localPlayer + offsets.team);
-
         for (short int i = 0; i <= 64; i++)
         {
 
