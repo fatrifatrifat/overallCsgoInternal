@@ -21,6 +21,8 @@ struct
     uintptr_t glowIndex = m_iGlowIndex;
     uintptr_t health = m_iHealth;
     uintptr_t isDefusing = m_bIsDefusing;
+    uintptr_t forceLMB = forceLMB;
+    uintptr_t crossH = m_iCrosshairId;
 
 }offsets;
 
@@ -30,13 +32,25 @@ struct
     uintptr_t localPlayer;
     uintptr_t ent;
     uintptr_t glowObject;
+    uintptr_t engineModule;
+    uintptr_t entity; //for tBot
     BYTE flag;
     int myTeam;
     int entityTeam;
     int glowIndex;
     int health;
+    int crosshair;
     bool defusing;
 }val;
+
+struct ClrRender
+{
+    BYTE red, green, blue;
+};
+
+ClrRender clrEnemy;
+
+ClrRender clrTeam;
 
 struct glowStruct
 {
@@ -108,6 +122,8 @@ void handleGlow()
     val.glowObject = *(uintptr_t*)(val.gameModule + offsets.glowObjectManager);
     val.myTeam = *(int*)(val.localPlayer + offsets.team);
 
+    
+
     for (short int i = 0; i <= 64; i++)
     {
 
@@ -119,11 +135,15 @@ void handleGlow()
             val.glowIndex = *(int*)(val.ent + offsets.glowIndex);
             val.entityTeam = *(int*)(val.ent + offsets.team);
 
+            
+
             if (isGlowEnabled) {
                 if (val.myTeam == val.entityTeam) {
+                    *(ClrRender*)(val.ent + m_clrRender) = clrTeam;
                     setTeamGlow(val.ent, val.glowIndex);
                 }
                 else {
+                    *(ClrRender*)(val.ent + m_clrRender) = clrEnemy;
                     setEnemyGlow(val.ent, val.glowIndex);
                 }
             }
@@ -133,12 +153,57 @@ void handleGlow()
 
 }
 
+void setBrightness()
+{
+    clrEnemy.red = 255;
+    clrEnemy.green = 0;
+    clrEnemy.blue = 0;
+
+    clrTeam.red = 0;
+    clrTeam.green = 0;
+    clrTeam.blue = 255;
+
+    float brightness = 5.0f;
+
+    int ptr = *(int*)(val.engineModule + model_ambient_min);
+    int xorptr = *(int*)&brightness^ ptr;
+    *(int*)(val.engineModule + model_ambient_min) = xorptr;
+}
+
+void shoot()
+{
+
+}
+
+bool checkTBot()
+{
+    val.crosshair = *(int*)(val.localPlayer + offsets.crossH);
+    val.ent = *(uintptr_t*)(val.gameModule + offsets.entList+((val.crosshair-1)*0x10));
+    val.entityTeam = *(int*)(val.entity + offsets.team);
+    val.health = *(int*)(val.entity + offsets.health);
+    std::cout << val.entity << std::endl;
+
+
+    return false;
+}
+
+void handleTBot()
+{
+    if (checkTBot)
+    {
+        shoot();
+    }
+}
+
 void main()
 {
     AllocConsole();
     freopen("CONOUT$", "w", stdout);
 
+    bool canTBot = false;
+
     val.gameModule = (uintptr_t)GetModuleHandle("client.dll");
+    val.engineModule = (uintptr_t)GetModuleHandle("engine.dll");
     val.localPlayer = *(uintptr_t*)(val.gameModule + offsets.lPlayer);
 
     if (val.localPlayer == NULL)
@@ -147,6 +212,7 @@ void main()
 
     std::cout << std::hex << val.localPlayer << std::endl;
 
+    setBrightness();
     while (true)
     {
         val.flag = *(BYTE*)(val.localPlayer + offsets.flags);
@@ -162,12 +228,25 @@ void main()
 
             }
 
+            //glow
             if (GetAsyncKeyState(VK_HOME) & 1) {
                 toggleGlow();
             }
 
             if (isGlowEnabled) {
                 handleGlow();
+            }
+
+            //tbot
+            if (GetAsyncKeyState(VK_F2) & 1)
+            {
+                val.myTeam = *(int*)(val.localPlayer + offsets.team);
+                canTBot = !canTBot;
+            }
+
+            if (canTBot)
+            {
+                handleTBot();
             }
 
             //anti-flash
@@ -183,6 +262,8 @@ void main()
 
             }
         }
+
+        Sleep(10);
  
     }
 
