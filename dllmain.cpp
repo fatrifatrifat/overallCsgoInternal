@@ -178,7 +178,7 @@ void shoot()
 bool checkTBot()
 {
     val.crosshair = *(int*)(val.localPlayer + offsets.crossH);
-    val.ent = *(uintptr_t*)(val.gameModule + offsets.entList+((val.crosshair-1)*0x10));
+    val.entity = *(uintptr_t*)(val.gameModule + offsets.entList+((val.crosshair-1)*0x10));
     val.entityTeam = *(int*)(val.entity + offsets.team);
     val.health = *(int*)(val.entity + offsets.health);
     std::cout << val.entity << std::endl;
@@ -189,7 +189,7 @@ bool checkTBot()
 
 void handleTBot()
 {
-    if (checkTBot)
+    if (checkTBot())
     {
         shoot();
     }
@@ -216,7 +216,7 @@ void main()
     while (true)
     {
         val.flag = *(BYTE*)(val.localPlayer + offsets.flags);
-
+        
         for (short int i = 0; i <= 64; i++)
         {
 
@@ -236,31 +236,31 @@ void main()
             if (isGlowEnabled) {
                 handleGlow();
             }
+ 
+        }
+        //tbot
+        if (GetAsyncKeyState(VK_F2) & 1)
+        {
+            val.myTeam = *(int*)(val.localPlayer + offsets.team);
+            canTBot = !canTBot;
+        }
 
-            //tbot
-            if (GetAsyncKeyState(VK_F2) & 1)
-            {
-                val.myTeam = *(int*)(val.localPlayer + offsets.team);
-                canTBot = !canTBot;
-            }
+        if (canTBot)
+        {
+            handleTBot();
+        }
 
-            if (canTBot)
-            {
-                handleTBot();
-            }
+        //bHop
+        if (GetAsyncKeyState(VK_SPACE) && val.flag & (1 << 0))
+        {
+            *(uintptr_t*)(val.gameModule + offsets.jump) = 6;
 
-            //anti-flash
-            if ((*(int*)(val.localPlayer + offsets.flashDuration)) != 0)
-            {
-                *(int*)(val.localPlayer + offsets.flashDuration) = 0;
-            }
+        }
 
-            //bHop
-            if (GetAsyncKeyState(VK_SPACE) && val.flag & (1 << 0))
-            {
-                *(uintptr_t*)(val.gameModule + offsets.jump) = 6;
-
-            }
+        //anti-flash
+        if ((*(int*)(val.localPlayer + offsets.flashDuration)) != 0)
+        {
+            *(int*)(val.localPlayer + offsets.flashDuration) = 0;
         }
 
         Sleep(10);
