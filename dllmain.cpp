@@ -21,7 +21,7 @@ struct
     uintptr_t glowIndex = m_iGlowIndex;
     uintptr_t health = m_iHealth;
     uintptr_t isDefusing = m_bIsDefusing;
-    uintptr_t forceLMB = forceLMB;
+    uintptr_t forceLMB = dwForceAttack;
     uintptr_t crossH = m_iCrosshairId;
 
 }offsets;
@@ -172,19 +172,33 @@ void setBrightness()
 
 void shoot()
 {
-
+    *(int*)(val.gameModule + offsets.forceLMB) = 5;
+    Sleep(20);
+    *(int*)(val.gameModule + offsets.forceLMB) = 4;
 }
 
 bool checkTBot()
 {
     val.crosshair = *(int*)(val.localPlayer + offsets.crossH);
-    val.entity = *(uintptr_t*)(val.gameModule + offsets.entList+((val.crosshair-1)*0x10));
-    val.entityTeam = *(int*)(val.entity + offsets.team);
-    val.health = *(int*)(val.entity + offsets.health);
-    std::cout << val.entityTeam << std::endl;
+    if (val.crosshair != 0 && val.crosshair <= 64)
+    {
+        val.entity = *(uintptr_t*)(val.gameModule + offsets.entList + ((val.crosshair - 1) * 0x10));
+        val.entityTeam = *(int*)(val.entity + offsets.team);
+        val.health = *(int*)(val.entity + offsets.health);
+        if (val.entityTeam != val.myTeam && val.health >0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
 
-
-    return false;
 }
 
 void handleTBot()
