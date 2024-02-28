@@ -2,6 +2,7 @@
 #include "pch.h"
 #include <Windows.h>
 #include <iostream>
+#include <cmath>
 #include <TlHelp32.h>
 #include "csgo.hpp"
 
@@ -23,7 +24,7 @@ struct
     uintptr_t isDefusing = m_bIsDefusing;
     uintptr_t forceLMB = dwForceAttack;
     uintptr_t crossH = m_iCrosshairId;
-
+    uintptr_t vecOrigin = m_vecOrigin;
 }offsets;
 
 struct
@@ -35,13 +36,20 @@ struct
     uintptr_t engineModule;
     uintptr_t entity; //for tBot
     BYTE flag;
+    int tBDelay;
     int myTeam;
     int entityTeam;
     int glowIndex;
     int health;
     int crosshair;
+    int myWeaponId;
     bool defusing;
 }val;
+
+struct vector
+{
+    float x, y, z;
+};
 
 struct ClrRender
 {
@@ -170,8 +178,19 @@ void setBrightness()
     *(int*)(val.engineModule + model_ambient_min) = xorptr;
 }
 
+void getDistance(uintptr_t entityt)
+{
+    vector myLoc = *(vector*)(val.localPlayer + offsets.vecOrigin);
+    vector eLoc = *(vector*)(entityt + offsets.vecOrigin);
+
+    float distance = sqrt(pow(myLoc.x - eLoc.x, 2) + pow(myLoc.y - eLoc.y, 2) + pow(myLoc.z - eLoc.z, 2))*0.0245;
+    val.tBDelay = distance * 3.3;
+
+}
+
 void shoot()
 {
+    Sleep(val.tBDelay);
     *(int*)(val.gameModule + offsets.forceLMB) = 5;
     Sleep(20);
     *(int*)(val.gameModule + offsets.forceLMB) = 4;
@@ -187,6 +206,7 @@ bool checkTBot()
         val.health = *(int*)(val.entity + offsets.health);
         if (val.entityTeam != val.myTeam && val.health >0)
         {
+            getDistance(val.entity);
             return true;
         }
         else
