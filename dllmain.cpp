@@ -181,7 +181,7 @@ bool checkTBot()
     val.entity = *(uintptr_t*)(val.gameModule + offsets.entList+((val.crosshair-1)*0x10));
     val.entityTeam = *(int*)(val.entity + offsets.team);
     val.health = *(int*)(val.entity + offsets.health);
-    std::cout << val.entity << std::endl;
+    std::cout << val.entityTeam << std::endl;
 
 
     return false;
